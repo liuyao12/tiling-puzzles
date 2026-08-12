@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2eee5" />
+    <meta name="description" content="A simple L-triomino tiling puzzle." />
+    <title>One Short — A Tiling Puzzle</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <a class="mark" href="." aria-label="One Short home">
+          <span class="mark-shape" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>ONE SHORT</span>
+        </a>
+        <button id="new-puzzle-top" class="text-button" type="button">New puzzle</button>
+      </header>
+      <section class="intro" aria-labelledby="title">
+        <p class="eyebrow">L–TRIOMINO NO. 01</p>
+        <h1 id="title">Fill every square.<br />Except <em>one.</em></h1>
+      </section>
+      <section class="game" aria-label="Tiling puzzle">
+        <div class="board-wrap">
+          <div id="board" class="board" role="grid" aria-label="Puzzle board"></div>
+          <div id="win" class="win" hidden>
+            <div class="win-mark" aria-hidden="true">✓</div>
+            <strong>Perfect fit.</strong>
+            <button id="play-again" type="button">Play again</button>
+          </div>
+        </div>
+        <aside class="controls" aria-label="Puzzle controls">
+          <div class="control-section">
+            <span class="label">Board</span>
+            <div class="size-picker" role="group" aria-label="Board size">
+              <button type="button" data-size="4">4 × 4</button>
+              <button type="button" data-size="8" class="active">8 × 8</button>
+              <button type="button" data-size="16">16 × 16</button>
+            </div>
+          </div>
+          <div class="control-section piece-section">
+            <span class="label">Piece</span>
+            <button id="rotate" class="piece-button" type="button" aria-label="Rotate piece clockwise">
+              <span id="piece-preview" class="piece-preview" aria-hidden="true"></span>
+              <span>Rotate <kbd>R</kbd></span>
+            </button>
+          </div>
+          <div class="control-section progress-section">
+            <span class="label">Placed</span>
+            <div class="counter"><strong id="placed-count">0</strong><span> / </span><span id="total-count">21</span></div>
+          </div>
+          <div class="actions">
+            <button id="undo" type="button" disabled>Undo</button>
+            <button id="reset" type="button">Reset</button>
+          </div>
+        </aside>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
