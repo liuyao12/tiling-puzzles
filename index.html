@@ -19,7 +19,7 @@
       </header>
       <section class="intro" aria-labelledby="title">
         <p class="eyebrow">L–TRIOMINO NO. 01</p>
-        <h1 id="title">Fill every square.<br />Except <em>one.</em></h1>
+        <h1 id="title">Make every piece<br /><em>fit.</em></h1>
       </section>
       <section class="game" aria-label="Tiling puzzle">
         <div class="board-wrap">
@@ -34,10 +34,24 @@
         <aside class="controls" aria-label="Puzzle controls">
           <div class="control-section">
             <span class="label">Board</span>
-            <form id="size-form" class="size-picker">
-              <label><input id="size-input" type="number" min="4" value="8" inputmode="numeric" aria-label="Board size" /> <span>× <output id="size-output">8</output></span></label>
-              <button type="submit">Set</button>
-            </form>
+            <div class="dimensions" aria-label="Board dimensions">
+              <div class="dimension-control">
+                <span>Width</span>
+                <div class="stepper">
+                  <button type="button" data-dimension="width" data-step="-1" aria-label="Decrease width">−</button>
+                  <output id="width-output">8</output>
+                  <button type="button" data-dimension="width" data-step="1" aria-label="Increase width">+</button>
+                </div>
+              </div>
+              <div class="dimension-control">
+                <span>Height</span>
+                <div class="stepper">
+                  <button type="button" data-dimension="height" data-step="-1" aria-label="Decrease height">−</button>
+                  <output id="height-output">8</output>
+                  <button type="button" data-dimension="height" data-step="1" aria-label="Increase height">+</button>
+                </div>
+              </div>
+            </div>
             <p id="missing-count" class="missing-count">1 square missing</p>
           </div>
           <div class="control-section piece-section">

@@ -20,7 +20,7 @@ h1 { max-width: 850px; margin: 13px 0 0; font-family: Georgia, "Times New Roman"
 h1 em { color: var(--orange); font-weight: 400; }
 .game { display: grid; grid-template-columns: minmax(280px,720px) minmax(210px,1fr); align-items: start; gap: clamp(30px,6vw,78px); }
 .board-wrap { position: relative; isolation: isolate; }
-.board { display: grid; width: 100%; aspect-ratio: 1; gap: var(--gap); padding: var(--gap); background: rgba(23,39,52,.14); border: 1px solid rgba(23,39,52,.12); box-shadow: 0 20px 50px rgba(23,39,52,.08); touch-action: manipulation; }
+.board { display: grid; width: 100%; gap: var(--gap); padding: var(--gap); background: rgba(23,39,52,.14); border: 1px solid rgba(23,39,52,.12); box-shadow: 0 20px 50px rgba(23,39,52,.08); touch-action: manipulation; }
 .cell { position: relative; min-width: 0; border: 0; border-radius: 1px; background: var(--cell); pointer-events: none; }
 .cell.blocked { background: var(--blocked); }
 .tile-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
@@ -33,11 +33,16 @@ h1 em { color: var(--orange); font-weight: 400; }
 .controls { border-top: 2px solid var(--ink); }
 .control-section { padding: 22px 0; border-bottom: 1px solid var(--line); }
 .label { display: block; margin-bottom: 15px; color: var(--muted); }
-.size-picker { display: flex; gap: 8px; }
-.size-picker label { display: flex; align-items: center; gap: 7px; color: var(--muted); font-family: Georgia,serif; font-size: 21px; }
-.size-picker input { width: 70px; border: 1px solid var(--line); padding: 8px 9px; color: var(--ink); background: rgba(255,255,255,.3); font: 700 16px Inter,ui-sans-serif,sans-serif; }
-.size-picker button, .actions button, .win button { border: 1px solid var(--line); padding: 9px 12px; color: var(--ink); background: transparent; cursor: pointer; font-size: 13px; font-weight: 700; }
-.size-picker button { color: var(--paper); border-color: var(--ink); background: var(--ink); }
+.dimensions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dimension-control > span { display: block; margin-bottom: 7px; color: var(--muted); font-size: 11px; font-weight: 700; }
+.stepper { display: grid; grid-template-columns: 38px minmax(34px,1fr) 38px; align-items: stretch; border: 1px solid var(--line); background: rgba(255,255,255,.24); }
+.stepper button { display: grid; min-height: 40px; place-items: center; border: 0; color: var(--ink); background: transparent; cursor: pointer; font-size: 24px; line-height: 1; }
+.stepper button:first-child { border-right: 1px solid var(--line); }
+.stepper button:last-child { border-left: 1px solid var(--line); }
+.stepper button:hover { color: var(--paper); background: var(--ink); }
+.stepper button:disabled { opacity: .25; cursor: default; background: transparent; color: var(--ink); }
+.stepper output { display: grid; place-items: center; font-family: Georgia,serif; font-size: 20px; }
+.actions button, .win button { border: 1px solid var(--line); padding: 9px 12px; color: var(--ink); background: transparent; cursor: pointer; font-size: 13px; font-weight: 700; }
 .missing-count { margin: 11px 0 0; color: var(--muted); font-size: 12px; }
 .piece-controls { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .piece-tray { display: grid; width: 92px; height: 92px; place-items: center; border: 1px dashed var(--line); padding: 0; background: rgba(255,255,255,.22); cursor: grab; touch-action: none; }

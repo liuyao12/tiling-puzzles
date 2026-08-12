@@ -3,8 +3,8 @@ const tileLayer = document.querySelector('#tile-layer');
 const pieceTray = document.querySelector('#piece-tray');
 const piecePreview = document.querySelector('#piece-preview');
 const dragPiece = document.querySelector('#drag-piece');
-const sizeInput = document.querySelector('#size-input');
-const sizeOutput = document.querySelector('#size-output');
+const widthOutput = document.querySelector('#width-output');
+const heightOutput = document.querySelector('#height-output');
 const missingCount = document.querySelector('#missing-count');
 const placedCount = document.querySelector('#placed-count');
 const totalCount = document.querySelector('#total-count');
@@ -18,7 +18,8 @@ const shapes = [
   [[0, 0], [0, 1], [1, 1]],
 ];
 
-let size = 8;
+let boardWidth = 8;
+let boardHeight = 8;
 let blocked = new Set();
 let rotation = 0;
 let nextTileId = 1;
@@ -26,14 +27,15 @@ let cells = [];
 let placements = [];
 let drag = null;
 
-const indexOf = (x, y) => y * size + x;
+const indexOf = (x, y) => y * boardWidth + x;
 
-function newPuzzle(nextSize = size) {
-  size = Math.max(4, Math.floor(nextSize) || 4);
+function newPuzzle(nextWidth = boardWidth, nextHeight = boardHeight) {
+  boardWidth = Math.max(4, Math.floor(nextWidth) || 4);
+  boardHeight = Math.max(4, Math.floor(nextHeight) || 4);
   rotation = 0;
   nextTileId = 1;
   placements = [];
-  blocked = makeSolvableHoles(size);
+  blocked = findRandomSolvableHoles(boardWidth, boardHeight);
   renderBoard();
   updateUI();
   winPanel.hidden = true;
@@ -42,13 +44,14 @@ function newPuzzle(nextSize = size) {
 function renderBoard() {
   board.innerHTML = '';
   tileLayer.innerHTML = '';
-  board.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-  board.setAttribute('aria-rowcount', size);
-  board.setAttribute('aria-colcount', size);
-  cells = Array.from({ length: size * size }, (_, index) => {
+  board.style.gridTemplateColumns = `repeat(${boardWidth}, 1fr)`;
+  board.style.aspectRatio = `${boardWidth} / ${boardHeight}`;
+  board.setAttribute('aria-rowcount', boardHeight);
+  board.setAttribute('aria-colcount', boardWidth);
+  cells = Array.from({ length: boardWidth * boardHeight }, (_, index) => {
     const cell = document.createElement('div');
-    const x = index % size;
-    const y = Math.floor(index / size);
+    const x = index % boardWidth;
+    const y = Math.floor(index / boardWidth);
     cell.className = blocked.has(index) ? 'cell blocked' : 'cell';
     cell.setAttribute('role', 'gridcell');
     cell.setAttribute('aria-label', blocked.has(index) ? `Missing square, row ${y + 1}, column ${x + 1}` : `Row ${y + 1}, column ${x + 1}`);
@@ -62,19 +65,73 @@ function candidateAt(x, y) {
 }
 
 function isValid(candidate, x, y) {
-  if (x < 0 || y < 0 || x + 1 >= size || y + 1 >= size) return false;
+  if (x < 0 || y < 0 || x + 1 >= boardWidth || y + 1 >= boardHeight) return false;
   return candidate.every(index => !blocked.has(index) && !cells[index]?.dataset.tile);
 }
 
-function makeSolvableHoles(n) {
-  const corners = [
-    [0, 1, n],
-    [n - 1, n - 2, 2 * n - 1],
-    [n * (n - 1), n * (n - 2), n * (n - 1) + 1],
-    [n * n - 1, n * n - 2, n * (n - 1) - 1],
-  ];
-  const corner = corners[Math.floor(Math.random() * corners.length)];
-  return new Set(n % 3 === 0 ? corner : [corner[0]]);
+function findRandomSolvableHoles(width, height) {
+  const holeCount = (width * height) % 3;
+  if (holeCount === 0) return new Set();
+  const total = width * height;
+
+  for (let attempt = 0; attempt < 160; attempt++) {
+    const holes = new Set();
+    while (holes.size < holeCount) holes.add(Math.floor(Math.random() * total));
+    if (hasTiling(width, height, holes, performance.now() + 35)) return holes;
+  }
+
+  for (let first = 0; first < total; first++) {
+    if (holeCount === 1) {
+      const holes = new Set([first]);
+      if (hasTiling(width, height, holes, performance.now() + 100)) return holes;
+      continue;
+    }
+    for (let second = first + 1; second < total; second++) {
+      const holes = new Set([first, second]);
+      if (hasTiling(width, height, holes, performance.now() + 100)) return holes;
+    }
+  }
+  throw new Error('No tilable puzzle could be generated');
+}
+
+function hasTiling(width, height, holes, deadline) {
+  const total = width * height;
+  const used = new Uint8Array(total);
+  holes.forEach(index => { used[index] = 1; });
+  const options = Array.from({ length: total }, () => []);
+
+  for (let y = 0; y < height - 1; y++) {
+    for (let x = 0; x < width - 1; x++) {
+      shapes.forEach(shape => {
+        const placement = shape.map(([dx, dy]) => (y + dy) * width + x + dx);
+        placement.forEach(index => options[index].push(placement));
+      });
+    }
+  }
+
+  function search(remaining) {
+    if (remaining === 0) return true;
+    if (performance.now() > deadline) return false;
+    let choices = null;
+
+    for (let index = 0; index < total; index++) {
+      if (used[index]) continue;
+      const available = options[index].filter(placement => placement.every(cell => !used[cell]));
+      if (choices === null || available.length < choices.length) {
+        choices = available;
+        if (available.length === 0) return false;
+      }
+    }
+
+    for (const placement of choices) {
+      placement.forEach(index => { used[index] = 1; });
+      if (search(remaining - 3)) return true;
+      placement.forEach(index => { used[index] = 0; });
+    }
+    return false;
+  }
+
+  return search(total - holes.size);
 }
 
 function boardGeometry() {
@@ -83,7 +140,6 @@ function boardGeometry() {
   const second = cells[1].getBoundingClientRect();
   return {
     boardRect,
-    cell: first.width,
     pitch: second.left - first.left,
     originX: first.left,
     originY: first.top,
@@ -94,14 +150,13 @@ function boardGeometry() {
 function placeTile(x, y) {
   const candidate = candidateAt(x, y);
   if (!isValid(candidate, x, y)) return false;
-
   const id = nextTileId++;
   const placement = { id, cells: candidate, x, y, rotation };
   candidate.forEach(index => { cells[index].dataset.tile = id; });
   placements.push(placement);
   renderPlacedTile(placement);
   updateUI();
-  if (placements.length === (size * size - blocked.size) / 3) winPanel.hidden = false;
+  if (placements.length === (boardWidth * boardHeight - blocked.size) / 3) winPanel.hidden = false;
   return true;
 }
 
@@ -173,12 +228,11 @@ function moveDrag(clientX, clientY) {
   drag.clientX = clientX;
   drag.clientY = clientY;
   if (Math.hypot(clientX - drag.startX, clientY - drag.startY) > 5) drag.moved = true;
-
   const geometry = boardGeometry();
   const margin = geometry.pitch * 0.7;
   const nearBoard = clientX >= geometry.boardRect.left - margin && clientX <= geometry.boardRect.right + margin && clientY >= geometry.boardRect.top - margin && clientY <= geometry.boardRect.bottom + margin;
-  let x = Math.round((clientX - geometry.originX - geometry.tileSize / 2) / geometry.pitch);
-  let y = Math.round((clientY - geometry.originY - geometry.tileSize / 2) / geometry.pitch);
+  const x = Math.round((clientX - geometry.originX - geometry.tileSize / 2) / geometry.pitch);
+  const y = Math.round((clientY - geometry.originY - geometry.tileSize / 2) / geometry.pitch);
   const candidate = candidateAt(x, y);
   const valid = nearBoard && isValid(candidate, x, y);
 
@@ -213,23 +267,27 @@ function endDrag(event) {
 
 function updateUI() {
   placedCount.textContent = placements.length;
-  totalCount.textContent = (size * size - blocked.size) / 3;
+  totalCount.textContent = (boardWidth * boardHeight - blocked.size) / 3;
   undoButton.disabled = placements.length === 0;
   piecePreview.dataset.rotation = rotation;
-  sizeInput.value = size;
-  sizeOutput.value = size;
-  sizeOutput.textContent = size;
-  missingCount.textContent = `${blocked.size} ${blocked.size === 1 ? 'square' : 'squares'} missing`;
+  widthOutput.value = boardWidth;
+  widthOutput.textContent = boardWidth;
+  heightOutput.value = boardHeight;
+  heightOutput.textContent = boardHeight;
+  missingCount.textContent = blocked.size === 0 ? 'No squares missing' : `${blocked.size} ${blocked.size === 1 ? 'square' : 'squares'} missing`;
+  document.querySelectorAll('[data-step="-1"]').forEach(button => {
+    const value = button.dataset.dimension === 'width' ? boardWidth : boardHeight;
+    button.disabled = value <= 4;
+  });
 }
 
-document.querySelector('#size-form').addEventListener('submit', event => {
-  event.preventDefault();
-  newPuzzle(Number(sizeInput.value));
-});
-sizeInput.addEventListener('input', () => {
-  const value = Math.max(4, Math.floor(Number(sizeInput.value)) || 4);
-  sizeOutput.value = value;
-  sizeOutput.textContent = value;
+document.querySelectorAll('[data-step]').forEach(button => {
+  button.addEventListener('click', () => {
+    const amount = Number(button.dataset.step);
+    const nextWidth = button.dataset.dimension === 'width' ? boardWidth + amount : boardWidth;
+    const nextHeight = button.dataset.dimension === 'height' ? boardHeight + amount : boardHeight;
+    newPuzzle(nextWidth, nextHeight);
+  });
 });
 pieceTray.addEventListener('pointerdown', beginDrag);
 pieceTray.addEventListener('pointermove', event => { if (drag) moveDrag(event.clientX, event.clientY); });
