@@ -24,6 +24,7 @@
       <section class="game" aria-label="Tiling puzzle">
         <div class="board-wrap">
           <div id="board" class="board" role="grid" aria-label="Puzzle board"></div>
+          <div id="tile-layer" class="tile-layer" aria-label="Placed tiles"></div>
           <div id="win" class="win" hidden>
             <div class="win-mark" aria-hidden="true">✓</div>
             <strong>Perfect fit.</strong>
@@ -33,18 +34,20 @@
         <aside class="controls" aria-label="Puzzle controls">
           <div class="control-section">
             <span class="label">Board</span>
-            <div class="size-picker" role="group" aria-label="Board size">
-              <button type="button" data-size="4">4 × 4</button>
-              <button type="button" data-size="8" class="active">8 × 8</button>
-              <button type="button" data-size="16">16 × 16</button>
-            </div>
+            <form id="size-form" class="size-picker">
+              <label><input id="size-input" type="number" min="4" value="8" inputmode="numeric" aria-label="Board size" /> <span>× <output id="size-output">8</output></span></label>
+              <button type="submit">Set</button>
+            </form>
+            <p id="missing-count" class="missing-count">1 square missing</p>
           </div>
           <div class="control-section piece-section">
             <span class="label">Piece</span>
-            <button id="rotate" class="piece-button" type="button" aria-label="Rotate piece clockwise">
-              <span id="piece-preview" class="piece-preview" aria-hidden="true"></span>
-              <span>Rotate <kbd>R</kbd></span>
-            </button>
+            <div class="piece-controls">
+              <button id="piece-tray" class="piece-tray" type="button" aria-label="Drag an L-triomino to the board; click to rotate">
+                <span id="piece-preview" class="piece-preview tile-shape" aria-hidden="true"></span>
+              </button>
+              <button id="rotate" class="rotate-button" type="button" aria-label="Rotate piece clockwise">Rotate <kbd>R</kbd></button>
+            </div>
           </div>
           <div class="control-section progress-section">
             <span class="label">Placed</span>
@@ -57,6 +60,7 @@
         </aside>
       </section>
     </main>
+    <div id="drag-piece" class="drag-piece tile-shape" aria-hidden="true"></div>
     <script src="app.js"></script>
   </body>
 </html>
