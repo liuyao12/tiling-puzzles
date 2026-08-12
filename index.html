@@ -55,12 +55,20 @@
             <p id="missing-count" class="missing-count">1 square missing</p>
           </div>
           <div class="control-section piece-section">
-            <span class="label">Piece</span>
-            <div class="piece-controls">
-              <button id="piece-tray" class="piece-tray" type="button" aria-label="Drag an L-triomino to the board; click to rotate">
-                <span id="piece-preview" class="piece-preview tile-shape" aria-hidden="true"></span>
+            <span class="label">Pieces</span>
+            <div class="piece-controls" aria-label="Drag a piece to the board">
+              <button class="piece-tray" type="button" data-piece-rotation="0" aria-label="Drag L-triomino, orientation 1">
+                <span class="piece-preview tile-shape" data-rotation="0" aria-hidden="true"></span>
               </button>
-              <button id="rotate" class="rotate-button" type="button" aria-label="Rotate piece clockwise">Rotate <kbd>R</kbd></button>
+              <button class="piece-tray" type="button" data-piece-rotation="1" aria-label="Drag L-triomino, orientation 2">
+                <span class="piece-preview tile-shape" data-rotation="1" aria-hidden="true"></span>
+              </button>
+              <button class="piece-tray" type="button" data-piece-rotation="2" aria-label="Drag L-triomino, orientation 3">
+                <span class="piece-preview tile-shape" data-rotation="2" aria-hidden="true"></span>
+              </button>
+              <button class="piece-tray" type="button" data-piece-rotation="3" aria-label="Drag L-triomino, orientation 4">
+                <span class="piece-preview tile-shape" data-rotation="3" aria-hidden="true"></span>
+              </button>
             </div>
           </div>
           <div class="control-section progress-section">

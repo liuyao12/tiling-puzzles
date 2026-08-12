@@ -44,15 +44,13 @@ h1 em { color: var(--orange); font-weight: 400; }
 .stepper output { display: grid; place-items: center; font-family: Georgia,serif; font-size: 20px; }
 .actions button, .win button { border: 1px solid var(--line); padding: 9px 12px; color: var(--ink); background: transparent; cursor: pointer; font-size: 13px; font-weight: 700; }
 .missing-count { margin: 11px 0 0; color: var(--muted); font-size: 12px; }
-.piece-controls { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.piece-tray { display: grid; width: 92px; height: 92px; place-items: center; border: 1px dashed var(--line); padding: 0; background: rgba(255,255,255,.22); cursor: grab; touch-action: none; }
+.piece-controls { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; }
+.piece-tray { display: grid; width: 100%; aspect-ratio: 1; place-items: center; border: 1px dashed var(--line); padding: 7px; background: rgba(255,255,255,.22); cursor: grab; touch-action: none; }
 .piece-tray:active { cursor: grabbing; }
-.piece-preview { display: block; width: 62px; height: 62px; filter: drop-shadow(0 7px 8px rgba(23,39,52,.12)); }
-.rotate-button { border: 0; border-bottom: 1px solid currentColor; padding: 4px 0; color: var(--ink); background: transparent; cursor: pointer; font-size: 12px; font-weight: 700; }
+.piece-preview { display: block; width: 100%; height: 100%; filter: drop-shadow(0 5px 6px rgba(23,39,52,.12)); }
 .drag-piece { position: fixed; z-index: 100; display: none; width: 80px; height: 80px; pointer-events: none; opacity: .88; filter: drop-shadow(0 12px 13px rgba(23,39,52,.22)); will-change: left,top,width,height; }
 .drag-piece.dragging { display: block; }
 .drag-piece.snapped { opacity: .72; filter: drop-shadow(0 3px 3px rgba(23,39,52,.16)); }
-kbd { margin-left: 5px; border: 1px solid var(--line); border-bottom-width: 2px; padding: 2px 5px; font: inherit; }
 .counter { display: flex; align-items: baseline; gap: 4px; color: var(--muted); font-family: Georgia,serif; font-size: 25px; }
 .counter strong { color: var(--ink); font-size: 48px; font-weight: 400; }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding-top: 22px; }

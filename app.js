@@ -1,7 +1,6 @@
 const board = document.querySelector('#board');
 const tileLayer = document.querySelector('#tile-layer');
-const pieceTray = document.querySelector('#piece-tray');
-const piecePreview = document.querySelector('#piece-preview');
+const pieceTrays = document.querySelectorAll('[data-piece-rotation]');
 const dragPiece = document.querySelector('#drag-piece');
 const widthOutput = document.querySelector('#width-output');
 const heightOutput = document.querySelector('#height-output');
@@ -32,7 +31,6 @@ const indexOf = (x, y) => y * boardWidth + x;
 function newPuzzle(nextWidth = boardWidth, nextHeight = boardHeight) {
   boardWidth = Math.max(4, Math.floor(nextWidth) || 4);
   boardHeight = Math.max(4, Math.floor(nextHeight) || 4);
-  rotation = 0;
   nextTileId = 1;
   placements = [];
   blocked = findRandomSolvableHoles(boardWidth, boardHeight);
@@ -60,8 +58,8 @@ function renderBoard() {
   });
 }
 
-function candidateAt(x, y) {
-  return shapes[rotation].map(([dx, dy]) => indexOf(x + dx, y + dy));
+function candidateAt(x, y, orientation = rotation) {
+  return shapes[orientation].map(([dx, dy]) => indexOf(x + dx, y + dy));
 }
 
 function isValid(candidate, x, y) {
@@ -206,17 +204,12 @@ function reset() {
   updateUI();
 }
 
-function rotate() {
-  rotation = (rotation + 1) % 4;
-  piecePreview.dataset.rotation = rotation;
-  dragPiece.dataset.rotation = rotation;
-  if (drag) moveDrag(drag.clientX, drag.clientY);
-}
-
 function beginDrag(event) {
   if (event.button !== undefined && event.button !== 0) return;
   event.preventDefault();
-  pieceTray.setPointerCapture?.(event.pointerId);
+  const tray = event.currentTarget;
+  rotation = Number(tray.dataset.pieceRotation);
+  tray.setPointerCapture?.(event.pointerId);
   drag = { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY, moved: false, startX: event.clientX, startY: event.clientY, candidate: null };
   dragPiece.dataset.rotation = rotation;
   dragPiece.classList.add('dragging');
@@ -258,18 +251,15 @@ function moveDrag(clientX, clientY) {
 function endDrag(event) {
   if (!drag || event.pointerId !== drag.pointerId) return;
   const dropped = drag.candidate;
-  const wasMoved = drag.moved;
   drag = null;
   dragPiece.classList.remove('dragging', 'snapped');
   if (dropped) placeTile(dropped.x, dropped.y);
-  else if (!wasMoved) rotate();
 }
 
 function updateUI() {
   placedCount.textContent = placements.length;
   totalCount.textContent = (boardWidth * boardHeight - blocked.size) / 3;
   undoButton.disabled = placements.length === 0;
-  piecePreview.dataset.rotation = rotation;
   widthOutput.value = boardWidth;
   widthOutput.textContent = boardWidth;
   heightOutput.value = boardHeight;
@@ -289,17 +279,17 @@ document.querySelectorAll('[data-step]').forEach(button => {
     newPuzzle(nextWidth, nextHeight);
   });
 });
-pieceTray.addEventListener('pointerdown', beginDrag);
-pieceTray.addEventListener('pointermove', event => { if (drag) moveDrag(event.clientX, event.clientY); });
-pieceTray.addEventListener('pointerup', endDrag);
-pieceTray.addEventListener('pointercancel', endDrag);
-document.querySelector('#rotate').addEventListener('click', rotate);
+pieceTrays.forEach(tray => {
+  tray.addEventListener('pointerdown', beginDrag);
+  tray.addEventListener('pointermove', event => { if (drag) moveDrag(event.clientX, event.clientY); });
+  tray.addEventListener('pointerup', endDrag);
+  tray.addEventListener('pointercancel', endDrag);
+});
 undoButton.addEventListener('click', undo);
 document.querySelector('#reset').addEventListener('click', reset);
 document.querySelector('#new-puzzle-top').addEventListener('click', () => newPuzzle());
 document.querySelector('#play-again').addEventListener('click', () => newPuzzle());
 document.addEventListener('keydown', event => {
-  if (event.key.toLowerCase() === 'r' && !event.metaKey && !event.ctrlKey) rotate();
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') undo();
 });
 window.addEventListener('resize', redrawTiles);
