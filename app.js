@@ -190,10 +190,10 @@ function boardGeometry() {
   return { boardRect, pitch: second.left - first.left, originX: first.left, originY: first.top };
 }
 
-function placeTile(x, y, kind, rotation, shape) {
+function placeTile(x, y, kind, rotation, shape, existingId = null) {
   const candidate = candidateAt(x, y, shape);
   if (!isValid(candidate, x, y, shape, kind)) return false;
-  const id = nextTileId++;
+  const id = existingId ?? nextTileId++;
   const placement = { id, cells: candidate, x, y, kind, rotation, shape };
   candidate.forEach(index => { cells[index].dataset.tile = id; });
   placements.push(placement);
@@ -213,12 +213,12 @@ function renderPlacedTile(placement) {
   tile.className = `placed-tile ${placement.shape.className}`;
   tile.dataset.id = placement.id;
   if (placement.kind === 'tri') tile.dataset.rotation = placement.rotation;
-  tile.setAttribute('aria-label', 'Remove placed tile');
+  tile.setAttribute('aria-label', 'Move placed tile');
   tile.style.left = `${first.left - layerRect.left}px`;
   tile.style.top = `${first.top - layerRect.top}px`;
   tile.style.width = `${last.right - first.left}px`;
   tile.style.height = `${last.bottom - first.top}px`;
-  tile.addEventListener('click', () => removeTile(placement.id));
+  tile.addEventListener('pointerdown', event => beginPlacedDrag(event, placement, tile));
   tileLayer.appendChild(tile);
 }
 
@@ -258,8 +258,21 @@ function beginDrag(event) {
   const kind = tray.dataset.pieceKind;
   const rotation = Number(tray.dataset.pieceRotation || 0);
   const shape = shapeFor(kind, rotation);
-  tray.setPointerCapture?.(event.pointerId);
-  drag = { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY, candidate: null, kind, rotation, shape };
+  startDrag(event, { kind, rotation, shape, source: null });
+}
+
+function beginPlacedDrag(event, placement, tile) {
+  if (event.button !== undefined && event.button !== 0) return;
+  event.preventDefault();
+  placement.cells.forEach(index => { delete cells[index].dataset.tile; });
+  placements = placements.filter(item => item.id !== placement.id);
+  tile.remove();
+  updateUI();
+  startDrag(event, { kind: placement.kind, rotation: placement.rotation, shape: placement.shape, source: placement });
+}
+
+function startDrag(event, { kind, rotation, shape, source }) {
+  drag = { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY, candidate: null, kind, rotation, shape, source };
   dragPiece.className = `drag-piece ${shape.className} dragging`;
   if (kind === 'tri') dragPiece.dataset.rotation = rotation;
   else delete dragPiece.dataset.rotation;
@@ -304,7 +317,11 @@ function endDrag(event) {
   const current = drag;
   drag = null;
   dragPiece.className = 'drag-piece';
-  if (current.candidate) placeTile(current.candidate.x, current.candidate.y, current.kind, current.rotation, current.shape);
+  if (current.candidate) {
+    placeTile(current.candidate.x, current.candidate.y, current.kind, current.rotation, current.shape, current.source?.id ?? null);
+  } else if (current.source) {
+    placeTile(current.source.x, current.source.y, current.source.kind, current.source.rotation, current.source.shape, current.source.id);
+  }
 }
 
 function updateUI() {
@@ -359,10 +376,13 @@ document.querySelectorAll('[data-step]').forEach(button => {
 
 document.querySelectorAll('[data-piece-kind]').forEach(tray => {
   tray.addEventListener('pointerdown', beginDrag);
-  tray.addEventListener('pointermove', event => { if (drag) moveDrag(event.clientX, event.clientY); });
-  tray.addEventListener('pointerup', endDrag);
-  tray.addEventListener('pointercancel', endDrag);
 });
+
+window.addEventListener('pointermove', event => {
+  if (drag && event.pointerId === drag.pointerId) moveDrag(event.clientX, event.clientY);
+});
+window.addEventListener('pointerup', endDrag);
+window.addEventListener('pointercancel', endDrag);
 
 undoButton.addEventListener('click', undo);
 document.querySelector('#reset').addEventListener('click', reset);

@@ -34,7 +34,8 @@ h1 em { color: var(--orange); font-weight: 400; }
 .tile-shape[data-rotation="1"] { clip-path: polygon(0 0,100% 0,100% 100%,50% 100%,50% 50%,0 50%); }
 .tile-shape[data-rotation="2"] { clip-path: polygon(50% 0,100% 0,100% 100%,0 100%,0 50%,50% 50%); }
 .tile-shape[data-rotation="3"] { clip-path: polygon(0 0,50% 0,50% 50%,100% 50%,100% 100%,0 100%); }
-.placed-tile { position: absolute; border: 0; padding: 0; pointer-events: auto; cursor: pointer; background: var(--tile-boundary); filter: saturate(.94); transition: filter 120ms ease; }
+.placed-tile { position: absolute; border: 0; padding: 0; pointer-events: auto; cursor: grab; touch-action: none; background: var(--tile-boundary); filter: saturate(.94); transition: filter 120ms ease; }
+.placed-tile:active { cursor: grabbing; }
 .placed-tile::after { content: ""; position: absolute; inset: clamp(1px,.18vw,2px); clip-path: inherit; background: var(--orange); pointer-events: none; }
 .placed-tile:hover { filter: brightness(1.08); }
 .controls { border-top: 2px solid var(--ink); }
