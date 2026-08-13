@@ -1,4 +1,5 @@
 const board = document.querySelector('#board');
+const boardWrap = document.querySelector('.board-wrap');
 const tileLayer = document.querySelector('#tile-layer');
 const pieceTrays = document.querySelectorAll('[data-piece-rotation]');
 const dragPiece = document.querySelector('#drag-piece');
@@ -56,6 +57,16 @@ function renderBoard() {
     board.appendChild(cell);
     return cell;
   });
+  requestAnimationFrame(fitBoard);
+}
+
+function fitBoard() {
+  boardWrap.style.width = '100%';
+  const maxWidth = boardWrap.getBoundingClientRect().width;
+  const top = boardWrap.getBoundingClientRect().top;
+  const availableHeight = Math.max(160, window.innerHeight - top - 18);
+  const widthForHeight = availableHeight * boardWidth / boardHeight;
+  boardWrap.style.width = `${Math.min(maxWidth, widthForHeight)}px`;
 }
 
 function candidateAt(x, y, orientation = rotation) {
@@ -287,11 +298,14 @@ pieceTrays.forEach(tray => {
 });
 undoButton.addEventListener('click', undo);
 document.querySelector('#reset').addEventListener('click', reset);
-document.querySelector('#new-puzzle-top').addEventListener('click', () => newPuzzle());
+document.querySelector('#new-puzzle').addEventListener('click', () => newPuzzle());
 document.querySelector('#play-again').addEventListener('click', () => newPuzzle());
 document.addEventListener('keydown', event => {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z') undo();
 });
-window.addEventListener('resize', redrawTiles);
+window.addEventListener('resize', () => {
+  fitBoard();
+  requestAnimationFrame(redrawTiles);
+});
 
 newPuzzle();
