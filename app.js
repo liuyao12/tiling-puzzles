@@ -90,7 +90,6 @@ function startPuzzle() {
 function renderBoard() {
   board.innerHTML = '';
   tileLayer.innerHTML = '';
-  board.classList.toggle('calendar-board', mode === 'calendar');
   board.style.gridTemplateColumns = `repeat(${boardWidth},minmax(0,1fr))`;
   board.style.gridTemplateRows = `repeat(${boardHeight},auto)`;
   board.setAttribute('aria-rowcount', boardHeight);
@@ -101,7 +100,6 @@ function renderBoard() {
     const y = Math.floor(index / boardWidth);
     cell.className = 'cell';
     if (!activeCells.has(index)) cell.classList.add('inactive');
-    if (mode === 'calendar' && (x === 0 || x === 6)) cell.classList.add('weekend');
     if (blocked.has(index)) cell.classList.add('blocked');
     if (cellLabels.has(index)) cell.textContent = cellLabels.get(index);
     cell.setAttribute('role', 'gridcell');
