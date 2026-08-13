@@ -3,8 +3,8 @@ const boardWrap = document.querySelector('.board-wrap');
 const tileLayer = document.querySelector('#tile-layer');
 const pieceTrays = document.querySelectorAll('[data-piece-rotation]');
 const dragPiece = document.querySelector('#drag-piece');
-const widthOutput = document.querySelector('#width-output');
-const heightOutput = document.querySelector('#height-output');
+const miniBoard = document.querySelector('#mini-board');
+const dimensionOutput = document.querySelector('#dimension-output');
 const missingCount = document.querySelector('#missing-count');
 const placedCount = document.querySelector('#placed-count');
 const totalCount = document.querySelector('#total-count');
@@ -271,10 +271,12 @@ function updateUI() {
   placedCount.textContent = placements.length;
   totalCount.textContent = (boardWidth * boardHeight - blocked.size) / 3;
   undoButton.disabled = placements.length === 0;
-  widthOutput.value = boardWidth;
-  widthOutput.textContent = boardWidth;
-  heightOutput.value = boardHeight;
-  heightOutput.textContent = boardHeight;
+  dimensionOutput.value = `${boardWidth} × ${boardHeight}`;
+  dimensionOutput.textContent = `${boardWidth} × ${boardHeight}`;
+  const miniScale = Math.min(104 / boardWidth, 68 / boardHeight);
+  miniBoard.style.width = `${boardWidth * miniScale}px`;
+  miniBoard.style.height = `${boardHeight * miniScale}px`;
+  miniBoard.style.backgroundSize = `${100 / boardWidth}% ${100 / boardHeight}%`;
   missingCount.textContent = blocked.size === 0 ? 'No squares missing' : `${blocked.size} ${blocked.size === 1 ? 'square' : 'squares'} missing`;
   document.querySelectorAll('[data-step="-1"]').forEach(button => {
     const value = button.dataset.dimension === 'width' ? boardWidth : boardHeight;
