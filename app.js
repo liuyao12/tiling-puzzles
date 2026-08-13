@@ -116,7 +116,7 @@ function fitBoard() {
   boardWrap.style.width = '100%';
   const maxWidth = boardWrap.getBoundingClientRect().width;
   const top = boardWrap.getBoundingClientRect().top;
-  const labelHeight = mode === 'calendar' ? 24 : 0;
+  const labelHeight = mode === 'calendar' ? monthName.getBoundingClientRect().height + calendarWeekdays.getBoundingClientRect().height + 10 : 0;
   const availableHeight = Math.max(160, window.innerHeight - top - labelHeight - 18);
   boardWrap.style.width = `${Math.min(maxWidth, availableHeight * boardWidth / boardHeight)}px`;
 }
@@ -340,6 +340,7 @@ function updateUI() {
   freeSizeControl.hidden = mode !== 'free';
   calendarInfo.hidden = mode !== 'calendar';
   calendarWeekdays.hidden = mode !== 'calendar';
+  monthName.hidden = mode !== 'calendar';
   specialPiece.hidden = !specialKind;
   specialTray.disabled = placements.some(item => item.kind !== 'tri');
   if (specialKind) {

@@ -23,6 +23,7 @@ h1 em { color: var(--orange); font-weight: 400; }
 .game { display: grid; grid-template-columns: minmax(280px,720px) minmax(230px,1fr); align-items: start; gap: clamp(26px,4vw,52px); }
 .board-wrap { position: relative; width: 100%; isolation: isolate; }
 .board-stage { position: relative; }
+.calendar-month { margin: 0 0 10px; font-family: Georgia,serif; font-size: clamp(24px,3vw,38px); font-weight: 400; letter-spacing: -.025em; text-align: center; }
 .calendar-weekdays { display: grid; grid-template-columns: repeat(7,1fr); padding: 0 var(--gap) 7px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
 .calendar-weekdays span:first-child,.calendar-weekdays span:last-child { color: var(--orange-dark); }
 .board { display: grid; width: 100%; gap: var(--gap); padding: var(--gap); background: rgba(23,39,52,.14); border: 1px solid rgba(23,39,52,.12); box-shadow: 0 20px 50px rgba(23,39,52,.08); touch-action: manipulation; }
@@ -54,8 +55,7 @@ h1 em { color: var(--orange); font-weight: 400; }
 .mini-board-stage { position: relative; grid-area: 2/2; display: grid; place-items: center; }
 .mini-board { min-width: 12px; min-height: 12px; border: 1px solid rgba(23,39,52,.24); background-color: var(--cell); background-image: linear-gradient(to right, transparent calc(100% - 1px), rgba(23,39,52,.18) 0),linear-gradient(to bottom, transparent calc(100% - 1px), rgba(23,39,52,.18) 0); box-shadow: 0 5px 12px rgba(23,39,52,.08); }
 .mini-board-stage output { position: absolute; right: 3px; bottom: 1px; padding: 2px 5px; color: var(--paper); background: var(--ink); font-size: 10px; font-weight: 800; letter-spacing: .04em; }
-.calendar-info { display: grid; gap: 4px; padding: 18px 0 10px; text-align: center; }
-.calendar-info strong { font-family: Georgia,serif; font-size: 25px; font-weight: 400; }
+.calendar-info { display: grid; gap: 4px; padding: 10px 0 6px; text-align: center; }
 .calendar-info span { color: var(--muted); font-size: 11px; }
 .actions button, .win button { border: 1px solid var(--line); padding: 9px 12px; color: var(--ink); background: transparent; cursor: pointer; font-size: 13px; font-weight: 700; }
 .missing-count { margin: 11px 0 0; color: var(--muted); font-size: 12px; }
