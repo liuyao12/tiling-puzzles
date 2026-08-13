@@ -1,10 +1,10 @@
 const board = document.querySelector('#board');
 const boardWrap = document.querySelector('.board-wrap');
+const boardControlShell = document.querySelector('#board-control-shell');
 const tileLayer = document.querySelector('#tile-layer');
 const dragPiece = document.querySelector('#drag-piece');
-const miniBoard = document.querySelector('#mini-board');
 const dimensionOutput = document.querySelector('#dimension-output');
-const freeSizeControl = document.querySelector('#free-size-control');
+const boardEdgeControls = document.querySelectorAll('.board-edge-control');
 const calendarInfo = document.querySelector('#calendar-info');
 const calendarWeekdays = document.querySelector('#calendar-weekdays');
 const monthName = document.querySelector('#month-name');
@@ -117,8 +117,11 @@ function fitBoard() {
   const maxWidth = boardWrap.getBoundingClientRect().width;
   const top = boardWrap.getBoundingClientRect().top;
   const labelHeight = mode === 'calendar' ? monthName.getBoundingClientRect().height + calendarWeekdays.getBoundingClientRect().height + 10 : 0;
-  const availableHeight = Math.max(160, window.innerHeight - top - labelHeight - 18);
-  boardWrap.style.width = `${Math.min(maxWidth, availableHeight * boardWidth / boardHeight)}px`;
+  const controlSpace = mode === 'free' ? (window.innerWidth <= 420 ? 80 : 96) : 0;
+  const availableWidth = Math.max(120, maxWidth - controlSpace);
+  const availableHeight = Math.max(160, window.innerHeight - top - labelHeight - controlSpace - 18);
+  const fittedBoardWidth = Math.min(availableWidth, availableHeight * boardWidth / boardHeight);
+  boardWrap.style.width = `${fittedBoardWidth + controlSpace}px`;
 }
 
 function candidateAt(x, y, shape) {
@@ -337,7 +340,9 @@ function updateUI() {
   placedCount.textContent = placements.length;
   totalCount.textContent = expectedTiles;
   undoButton.disabled = placements.length === 0;
-  freeSizeControl.hidden = mode !== 'free';
+  boardControlShell.classList.toggle('free-sizing', mode === 'free');
+  boardEdgeControls.forEach(button => { button.hidden = mode !== 'free'; });
+  dimensionOutput.hidden = mode !== 'free';
   calendarInfo.hidden = mode !== 'calendar';
   calendarWeekdays.hidden = mode !== 'calendar';
   monthName.hidden = mode !== 'calendar';
@@ -350,10 +355,6 @@ function updateUI() {
   }
   if (mode === 'free') {
     dimensionOutput.textContent = `${boardWidth} × ${boardHeight}`;
-    const miniScale = Math.min(104 / boardWidth, 68 / boardHeight);
-    miniBoard.style.width = `${boardWidth * miniScale}px`;
-    miniBoard.style.height = `${boardHeight * miniScale}px`;
-    miniBoard.style.backgroundSize = `${100 / boardWidth}% ${100 / boardHeight}%`;
     missingCount.textContent = blocked.size === 0 ? 'No squares missing' : `${blocked.size} ${blocked.size === 1 ? 'square' : 'squares'} missing`;
   } else {
     const specialCopy = specialKind === 'mono' ? ' · one single square included' : specialKind === 'domino' ? ' · one domino included' : '';

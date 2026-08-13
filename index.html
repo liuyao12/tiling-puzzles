@@ -30,29 +30,26 @@
           <div id="calendar-weekdays" class="calendar-weekdays" aria-hidden="true">
             <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
           </div>
-          <div class="board-stage">
-            <div id="board" class="board" role="grid" aria-label="Puzzle board"></div>
-            <div id="tile-layer" class="tile-layer" aria-label="Placed tiles"></div>
-            <div id="win" class="win" hidden>
-              <div class="win-mark" aria-hidden="true">✓</div>
-              <strong>Perfect fit.</strong>
-              <button id="play-again" type="button">Play again</button>
+          <div id="board-control-shell" class="board-control-shell">
+            <button class="board-edge-control edge-top" type="button" data-dimension="height" data-step="1" aria-label="Increase board height" hidden>+</button>
+            <button class="board-edge-control edge-left" type="button" data-dimension="width" data-step="-1" aria-label="Decrease board width" hidden>−</button>
+            <div class="board-stage">
+              <div id="board" class="board" role="grid" aria-label="Puzzle board"></div>
+              <div id="tile-layer" class="tile-layer" aria-label="Placed tiles"></div>
+              <output id="dimension-output" class="board-dimension" hidden>8 × 8</output>
+              <div id="win" class="win" hidden>
+                <div class="win-mark" aria-hidden="true">✓</div>
+                <strong>Perfect fit.</strong>
+                <button id="play-again" type="button">Play again</button>
+              </div>
             </div>
+            <button class="board-edge-control edge-right" type="button" data-dimension="width" data-step="1" aria-label="Increase board width" hidden>+</button>
+            <button class="board-edge-control edge-bottom" type="button" data-dimension="height" data-step="-1" aria-label="Decrease board height" hidden>−</button>
           </div>
         </div>
         <aside class="controls" aria-label="Puzzle controls">
           <div class="control-section">
             <span class="label">Board</span>
-            <div id="free-size-control" class="board-size-control" aria-label="Board dimensions" hidden>
-              <button class="size-side size-top" type="button" data-dimension="height" data-step="1" aria-label="Increase height">+</button>
-              <button class="size-side size-left" type="button" data-dimension="width" data-step="-1" aria-label="Decrease width">−</button>
-              <div class="mini-board-stage">
-                <div id="mini-board" class="mini-board" aria-hidden="true"></div>
-                <output id="dimension-output">8 × 8</output>
-              </div>
-              <button class="size-side size-right" type="button" data-dimension="width" data-step="1" aria-label="Increase width">+</button>
-              <button class="size-side size-bottom" type="button" data-dimension="height" data-step="-1" aria-label="Decrease height">−</button>
-            </div>
             <div id="calendar-info" class="calendar-info">
               <span id="calendar-size">7 columns · 6 weeks</span>
             </div>
