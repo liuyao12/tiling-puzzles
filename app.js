@@ -29,6 +29,7 @@ const triominoes = [
 let mode = 'calendar';
 let boardWidth = 7;
 let boardHeight = 6;
+let activeCells = new Set();
 let blocked = new Set();
 let cellLabels = new Map();
 let specialKind = 'domino';
@@ -58,17 +59,20 @@ function newCalendarPuzzle() {
   const days = new Date(year, month + 1, 0).getDate();
   boardWidth = 7;
   boardHeight = Math.max(5, Math.ceil((firstWeekday + days) / 7));
+  activeCells = new Set(Array.from({ length: days }, (_, index) => firstWeekday + index));
   blocked = new Set([firstWeekday + today.getDate() - 1]);
   cellLabels = new Map([[firstWeekday + today.getDate() - 1, today.getDate()]]);
-  specialKind = boardHeight === 5 ? 'mono' : 'domino';
+  const remainder = (days - 1) % 3;
+  specialKind = remainder === 1 ? 'mono' : remainder === 2 ? 'domino' : null;
   monthName.textContent = today.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-  calendarSize.textContent = `Sunday–Saturday · ${boardHeight} weeks`;
+  calendarSize.textContent = `${days}-square calendar · Sunday–Saturday`;
   startPuzzle();
 }
 
 function newFreePuzzle(nextWidth = boardWidth, nextHeight = boardHeight) {
   boardWidth = Math.max(4, Math.floor(nextWidth) || 4);
   boardHeight = Math.max(4, Math.floor(nextHeight) || 4);
+  activeCells = new Set(Array.from({ length: boardWidth * boardHeight }, (_, index) => index));
   blocked = findRandomSolvableHoles(boardWidth, boardHeight);
   cellLabels = new Map();
   specialKind = null;
@@ -86,8 +90,9 @@ function startPuzzle() {
 function renderBoard() {
   board.innerHTML = '';
   tileLayer.innerHTML = '';
-  board.style.gridTemplateColumns = `repeat(${boardWidth},1fr)`;
-  board.style.aspectRatio = `${boardWidth}/${boardHeight}`;
+  board.classList.toggle('calendar-board', mode === 'calendar');
+  board.style.gridTemplateColumns = `repeat(${boardWidth},minmax(0,1fr))`;
+  board.style.gridTemplateRows = `repeat(${boardHeight},auto)`;
   board.setAttribute('aria-rowcount', boardHeight);
   board.setAttribute('aria-colcount', boardWidth);
   cells = Array.from({ length: boardWidth * boardHeight }, (_, index) => {
@@ -95,11 +100,12 @@ function renderBoard() {
     const x = index % boardWidth;
     const y = Math.floor(index / boardWidth);
     cell.className = 'cell';
+    if (!activeCells.has(index)) cell.classList.add('inactive');
     if (mode === 'calendar' && (x === 0 || x === 6)) cell.classList.add('weekend');
     if (blocked.has(index)) cell.classList.add('blocked');
     if (cellLabels.has(index)) cell.textContent = cellLabels.get(index);
     cell.setAttribute('role', 'gridcell');
-    cell.setAttribute('aria-label', blocked.has(index) ? `Today, ${cellLabels.get(index)}` : `Row ${y + 1}, column ${x + 1}`);
+    cell.setAttribute('aria-label', !activeCells.has(index) ? 'Outside this month' : blocked.has(index) ? `Today, ${cellLabels.get(index)}` : `Calendar square, row ${y + 1}, column ${x + 1}`);
     board.appendChild(cell);
     return cell;
   });
@@ -122,7 +128,7 @@ function candidateAt(x, y, shape) {
 function isValid(candidate, x, y, shape, kind) {
   if (x < 0 || y < 0 || x + shape.width > boardWidth || y + shape.height > boardHeight) return false;
   if (kind !== 'tri' && placements.some(item => item.kind !== 'tri')) return false;
-  return candidate.every(index => !blocked.has(index) && !cells[index]?.dataset.tile);
+  return candidate.every(index => activeCells.has(index) && !blocked.has(index) && !cells[index]?.dataset.tile);
 }
 
 function findRandomSolvableHoles(width, height) {
@@ -200,7 +206,7 @@ function placeTile(x, y, kind, rotation, shape, existingId = null) {
   renderPlacedTile(placement);
   updateUI();
   const covered = placements.reduce((sum, item) => sum + item.cells.length, 0);
-  if (covered === boardWidth * boardHeight - blocked.size) winPanel.hidden = false;
+  if (covered === activeCells.size - blocked.size) winPanel.hidden = false;
   return true;
 }
 
@@ -325,7 +331,7 @@ function endDrag(event) {
 }
 
 function updateUI() {
-  const playable = boardWidth * boardHeight - blocked.size;
+  const playable = activeCells.size - blocked.size;
   const specialSize = specialKind === 'mono' ? 1 : specialKind === 'domino' ? 2 : 0;
   const expectedTiles = (playable - specialSize) / 3 + (specialSize ? 1 : 0);
   placedCount.textContent = placements.length;
@@ -349,7 +355,8 @@ function updateUI() {
     miniBoard.style.backgroundSize = `${100 / boardWidth}% ${100 / boardHeight}%`;
     missingCount.textContent = blocked.size === 0 ? 'No squares missing' : `${blocked.size} ${blocked.size === 1 ? 'square' : 'squares'} missing`;
   } else {
-    missingCount.textContent = `${cellLabels.values().next().value} stays visible · ${specialKind === 'mono' ? 'one single square' : 'one domino'} included`;
+    const specialCopy = specialKind === 'mono' ? ' · one single square included' : specialKind === 'domino' ? ' · one domino included' : '';
+    missingCount.textContent = `${cellLabels.values().next().value} stays visible${specialCopy}`;
   }
   document.querySelectorAll('[data-step="-1"]').forEach(button => {
     const value = button.dataset.dimension === 'width' ? boardWidth : boardHeight;

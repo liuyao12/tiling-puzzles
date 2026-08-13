@@ -26,7 +26,9 @@ h1 em { color: var(--orange); font-weight: 400; }
 .calendar-weekdays { display: grid; grid-template-columns: repeat(7,1fr); padding: 0 var(--gap) 7px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
 .calendar-weekdays span:first-child,.calendar-weekdays span:last-child { color: var(--orange-dark); }
 .board { display: grid; width: 100%; gap: var(--gap); padding: var(--gap); background: rgba(23,39,52,.14); border: 1px solid rgba(23,39,52,.12); box-shadow: 0 20px 50px rgba(23,39,52,.08); touch-action: manipulation; }
-.cell { position: relative; min-width: 0; border: 0; border-radius: 1px; background: var(--cell); pointer-events: none; }
+.board.calendar-board { background: transparent; border-color: transparent; box-shadow: none; }
+.cell { position: relative; min-width: 0; min-height: 0; aspect-ratio: 1; overflow: hidden; border: 0; border-radius: 1px; background: var(--cell); pointer-events: none; }
+.cell.inactive { visibility: hidden; }
 .cell.weekend { background: #f2ede4; }
 .cell.blocked { display: grid; place-items: center; color: var(--paper); background: var(--blocked); font-family: Georgia,serif; font-size: clamp(15px,3vw,32px); font-weight: 700; }
 .tile-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
