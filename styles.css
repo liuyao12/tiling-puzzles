@@ -1,6 +1,6 @@
 :root {
   --paper: #f2eee5; --ink: #172734; --muted: #788087; --line: rgba(23,39,52,.18);
-  --orange: #ed6a3b; --orange-dark: #d44f24; --blocked: #172734; --cell: #faf7f0;
+  --orange: #ed6a3b; --orange-dark: #d44f24; --blocked: #172734; --cell: #faf7f0; --tile-boundary: #c8c7c2;
   --gap: clamp(2px, .45vw, 5px);
 }
 * { box-sizing: border-box; }
@@ -28,7 +28,8 @@ h1 em { color: var(--orange); font-weight: 400; }
 .tile-shape[data-rotation="1"] { clip-path: polygon(0 0,100% 0,100% 100%,50% 100%,50% 50%,0 50%); }
 .tile-shape[data-rotation="2"] { clip-path: polygon(50% 0,100% 0,100% 100%,0 100%,0 50%,50% 50%); }
 .tile-shape[data-rotation="3"] { clip-path: polygon(0 0,50% 0,50% 50%,100% 50%,100% 100%,0 100%); }
-.placed-tile { position: absolute; border: 0; padding: 0; pointer-events: auto; cursor: pointer; filter: saturate(.94); transition: filter 120ms ease; }
+.placed-tile { position: absolute; border: 0; padding: 0; pointer-events: auto; cursor: pointer; background: var(--tile-boundary); filter: saturate(.94); transition: filter 120ms ease; }
+.placed-tile::after { content: ""; position: absolute; inset: clamp(1px,.18vw,2px); clip-path: inherit; background: var(--orange); pointer-events: none; }
 .placed-tile:hover { filter: brightness(1.08); }
 .controls { border-top: 2px solid var(--ink); }
 .control-section { padding: 22px 0; border-bottom: 1px solid var(--line); }
@@ -48,7 +49,8 @@ h1 em { color: var(--orange); font-weight: 400; }
 .piece-tray { display: grid; width: 100%; aspect-ratio: 1; place-items: center; border: 1px dashed var(--line); padding: 7px; background: rgba(255,255,255,.22); cursor: grab; touch-action: none; }
 .piece-tray:active { cursor: grabbing; }
 .piece-preview { display: block; width: 100%; height: 100%; filter: drop-shadow(0 5px 6px rgba(23,39,52,.12)); }
-.drag-piece { position: fixed; z-index: 100; display: none; width: 80px; height: 80px; pointer-events: none; opacity: .88; filter: drop-shadow(0 12px 13px rgba(23,39,52,.22)); will-change: left,top,width,height; }
+.drag-piece { position: fixed; z-index: 100; display: none; width: 80px; height: 80px; pointer-events: none; opacity: .88; background: var(--tile-boundary); filter: drop-shadow(0 12px 13px rgba(23,39,52,.22)); will-change: left,top,width,height; }
+.drag-piece::after { content: ""; position: absolute; inset: clamp(1px,.18vw,2px); clip-path: inherit; background: var(--orange); }
 .drag-piece.dragging { display: block; }
 .drag-piece.snapped { opacity: .72; filter: drop-shadow(0 3px 3px rgba(23,39,52,.16)); }
 .counter { display: flex; align-items: baseline; gap: 4px; color: var(--muted); font-family: Georgia,serif; font-size: 25px; }
